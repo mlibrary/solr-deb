@@ -81,7 +81,7 @@ if which dpkg-deb > /dev/null; then
   $TOUCH_CMD $CONTROL_FILE
   $TOUCH_CMD $ROOT_DIR/DEBIAN
 
-  SOURCE_DATE_EPOCH=$BUILD_TIME dpkg-deb --build --root-owner-group $ROOT_DIR
+  SOURCE_DATE_EPOCH=$BUILD_TIME dpkg-deb -Zxz --build --root-owner-group $ROOT_DIR
   sha1sum $DEB
 
   if ! [ -z $GITHUB_ENV ]; then
