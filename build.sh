@@ -11,12 +11,21 @@ ARCH="all"
 ROOT_DIR="${PACKAGE_NAME}_${SOLR_VERSION}-${PATCH_NUMBER}_${ARCH}"
 DEB="${ROOT_DIR}.deb"
 
-if git diff --exit-code --cached; then
+# Always use 24h clock
+export LANG=C
+# Prevent unzip from setting wrong timestamps
+export TZ=UTC
+
+if git diff-index --quiet HEAD --
+then
   BUILD_TIME=`git show --no-patch --format=%ct`
 else
   echo >&2 "WARNING: you have uncommited changes, this build will not be reproducible!"
   BUILD_TIME=`date '+%s'`
 fi
+DATE=`date -d @${BUILD_TIME}`
+echo "Setting build time: ${BUILD_TIME} (${DATE})"
+TOUCH_CMD="touch --no-create --date=@${BUILD_TIME}"
 
 if [ ! -f $SOLR_ZIP ]; then
   URL="https://archive.apache.org/dist/lucene/solr/${SOLR_VERSION}/${SOLR_ZIP}"
@@ -42,6 +51,8 @@ echo "Extracting: ${SOLR_ZIP}"
 unzip -q $SOLR_ZIP
 
 patch --forward --reject-file=- $SOLR_DIR/bin/solr bin-solr.diff
+$TOUCH_CMD $SOLR_DIR/bin/solr
+$TOUCH_CMD $SOLR_DIR/bin/
 
 echo "Moving $SOLR_DIR to $ROOT_DIR/opt/solr"
 mkdir -p $ROOT_DIR/opt
@@ -65,12 +76,12 @@ echo " interface."                                                             >
 echo                                                                           >> $CONTROL_FILE
 
 if which dpkg-deb > /dev/null; then
-  DATE=`date -d @${BUILD_TIME}`
-  echo "Setting build time: ${BUILD_TIME} (${DATE})"
-  touch --no-create --date=@$BUILD_TIME $ROOT_DIR/DEBIAN
-  touch --no-create --date=@$BUILD_TIME $CONTROL_FILE
+  $TOUCH_CMD $ROOT_DIR/opt
+  $TOUCH_CMD $ROOT_DIR
+  $TOUCH_CMD $CONTROL_FILE
+  $TOUCH_CMD $ROOT_DIR/DEBIAN
 
-  dpkg-deb --build --root-owner-group $ROOT_DIR
+  SOURCE_DATE_EPOCH=$BUILD_TIME dpkg-deb --build --root-owner-group $ROOT_DIR
   sha1sum $DEB
 
   if ! [ -z $GITHUB_ENV ]; then
