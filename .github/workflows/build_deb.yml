@@ -1,0 +1,20 @@
+name: 'Build .deb package'
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: build
+        run: ./build.sh
+
+      - name: upload .deb
+        uses: actions/upload-artifact@v3
+        with:
+          name: "${{ env.DEB }}"
+          path: "${{ env.DEB }}"

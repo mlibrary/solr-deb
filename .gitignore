@@ -1,0 +1,4 @@
+*.zip
+solr*
+!*.sha1
+extract

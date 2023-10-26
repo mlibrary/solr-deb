@@ -1,0 +1,36 @@
+--- solr.dist	2023-10-25 23:54:14.162995564 -0400
++++ solr	2023-10-25 23:56:15.447091985 -0400
+@@ -139,19 +139,20 @@
+   exit 1
+ else
+   JAVA_VER_NUM=$(echo $JAVA_VER | head -1 | awk -F '"' '/version/ {print $2}')
+-  if [[ "$JAVA_VER_NUM" < "$JAVA_VER_REQ" ]] ; then
+-    echo >&2 "Your current version of Java is too old to run this version of Solr"
+-    echo >&2 "We found version $JAVA_VER_NUM, using command '${JAVA} -version', with response:"
+-    echo >&2 "${JAVA_VER}"
+-    echo >&2
+-    echo >&2 "Please install latest version of Java $JAVA_VER_REQ or set JAVA_HOME properly."
+-    echo >&2
+-    echo >&2 "Debug information:"
+-    echo >&2 "JAVA_HOME: ${JAVA_HOME:-N/A}"
+-    echo >&2 "Active Path:"
+-    echo >&2 "${PATH}"
+-    exit 1
+-  fi
++  # *** Java version check is totally broken. Disable it. ***
++  #if [[ "$JAVA_VER_NUM" < "$JAVA_VER_REQ" ]] ; then
++  #  echo >&2 "Your current version of Java is too old to run this version of Solr"
++  #  echo >&2 "We found version $JAVA_VER_NUM, using command '${JAVA} -version', with response:"
++  #  echo >&2 "${JAVA_VER}"
++  #  echo >&2
++  #  echo >&2 "Please install latest version of Java $JAVA_VER_REQ or set JAVA_HOME properly."
++  #  echo >&2
++  #  echo >&2 "Debug information:"
++  #  echo >&2 "JAVA_HOME: ${JAVA_HOME:-N/A}"
++  #  echo >&2 "Active Path:"
++  #  echo >&2 "${PATH}"
++  #  exit 1
++  #fi
+   JAVA_VENDOR="Oracle"
+   if [ "`echo $JAVA_VER | grep -i "IBM J9"`" != "" ]; then
+       JAVA_VENDOR="IBM J9"
