@@ -1,6 +1,13 @@
 # Build solr .deb packages
 ## Requirements
-- `dpkg-deb`, gnu `date`
+The following binaries are expected to be available in your `$PATH`:
+- `dpkg-deb`
+- `git`
+- `patch`
+- `sha1sum` or `shasum`
+- `unzip`
+- `wget`
+
 ## Features
 - Reproducible builds: For a given git commit the resulting `.deb` package should be identical every time it's built.
 ## Usage

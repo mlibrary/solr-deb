@@ -14,12 +14,14 @@ DEB="${ROOT_DIR}.deb"
 # use consistant build env
 # https://wiki.debian.org/ReproducibleBuilds/Howto
 # especially important are the notes on `unzip` and `umask`
-export LC_ALL=C.UTF-8
+export LC_ALL=C
 export TZ=UTC
 umask 0022
 
 export SOURCE_DATE_EPOCH=`git show --no-patch --format=%ct`
-TOUCH_CMD="touch --no-create --date=@${SOURCE_DATE_EPOCH}"
+# use POSIX touch syntax for maximum compatibility
+SOURCE_DATE_TOUCH_STAMP_FMT=`git show --no-patch --format=%cd --date=format:%C%y%m%d%H%M.%S`
+TOUCH_CMD="touch -c -t ${SOURCE_DATE_TOUCH_STAMP_FMT}"
 
 if [ ! -f $SOLR_ZIP ]; then
   URL="https://archive.apache.org/dist/lucene/solr/${SOLR_VERSION}/${SOLR_ZIP}"
@@ -37,7 +39,16 @@ if [ -d $ROOT_DIR ]; then
   rm -r $ROOT_DIR
 fi
 
-if ! sha1sum -c "checksum/${SOLR_ZIP}.sha1"; then
+if which shasum > /dev/null; then
+  SHA_CMD="shasum"
+elif which sha1sum > /dev/null; then
+  SHA_CMD="sha1sum"
+else
+  echo >&2 "shasum/sha1sum not found"
+  exit 1
+fi
+
+if ! $SHA_CMD -c "checksum/${SOLR_ZIP}.sha1"; then
   exit 1
 fi
 
