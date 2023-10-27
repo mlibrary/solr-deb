@@ -4,7 +4,7 @@ PACKAGE_NAME="solr"
 # upstream solr version
 SOLR_VERSION="6.6.5"
 # serial number for locally applied patch
-PATCH_NUMBER=1
+PATCH_NUMBER=2
 SOLR_DIR="${PACKAGE_NAME}-${SOLR_VERSION}"
 SOLR_ZIP="${PACKAGE_NAME}-${SOLR_VERSION}.zip"
 ARCH="all"
@@ -39,9 +39,9 @@ if [ -d $ROOT_DIR ]; then
   rm -r $ROOT_DIR
 fi
 
-if which shasum > /dev/null; then
+if command -v shasum > /dev/null; then
   SHA_CMD="shasum"
-elif which sha1sum > /dev/null; then
+elif command -v sha1sum > /dev/null; then
   SHA_CMD="sha1sum"
 else
   echo >&2 "shasum/sha1sum not found"
@@ -53,9 +53,9 @@ if ! $SHA_CMD -c "checksum/${SOLR_ZIP}.sha1"; then
 fi
 
 echo "Extracting: ${SOLR_ZIP}"
-unzip -q $SOLR_ZIP
+unzip -q $SOLR_ZIP || exit 1
 
-patch --forward --reject-file=- $SOLR_DIR/bin/solr bin-solr.diff
+patch --forward --reject-file=- $SOLR_DIR/bin/solr bin-solr.diff || exit 1
 $TOUCH_CMD $SOLR_DIR/bin/solr
 $TOUCH_CMD $SOLR_DIR/bin/
 
@@ -80,7 +80,7 @@ echo " faceted search, caching, replication, and a web administration"         >
 echo " interface."                                                             >> $CONTROL_FILE
 echo                                                                           >> $CONTROL_FILE
 
-if which dpkg-deb > /dev/null; then
+if command -v dpkg-deb > /dev/null; then
   $TOUCH_CMD $ROOT_DIR/opt
   $TOUCH_CMD $ROOT_DIR
   $TOUCH_CMD $CONTROL_FILE
