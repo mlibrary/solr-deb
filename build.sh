@@ -18,16 +18,8 @@ export LC_ALL=C.UTF-8
 export TZ=UTC
 umask 0022
 
-if git diff-index --quiet HEAD --
-then
-  BUILD_TIME=`git show --no-patch --format=%ct`
-else
-  echo >&2 "WARNING: you have uncommited changes, this build will not be reproducible!"
-  BUILD_TIME=`date '+%s'`
-fi
-DATE=`date -d @${BUILD_TIME}`
-echo "Setting build time: ${BUILD_TIME} (${DATE})"
-TOUCH_CMD="touch --no-create --date=@${BUILD_TIME}"
+export SOURCE_DATE_EPOCH=`git show --no-patch --format=%ct`
+TOUCH_CMD="touch --no-create --date=@${SOURCE_DATE_EPOCH}"
 
 if [ ! -f $SOLR_ZIP ]; then
   URL="https://archive.apache.org/dist/lucene/solr/${SOLR_VERSION}/${SOLR_ZIP}"
@@ -83,7 +75,7 @@ if which dpkg-deb > /dev/null; then
   $TOUCH_CMD $CONTROL_FILE
   $TOUCH_CMD $ROOT_DIR/DEBIAN
 
-  SOURCE_DATE_EPOCH=$BUILD_TIME dpkg-deb -Zxz --build --root-owner-group $ROOT_DIR
+  dpkg-deb -Zxz --build --root-owner-group $ROOT_DIR
   sha1sum $DEB
 
   if ! [ -z $GITHUB_ENV ]; then
