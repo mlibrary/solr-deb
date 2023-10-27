@@ -11,10 +11,12 @@ ARCH="all"
 ROOT_DIR="${PACKAGE_NAME}_${SOLR_VERSION}-${PATCH_NUMBER}_${ARCH}"
 DEB="${ROOT_DIR}.deb"
 
-# Always use 24h clock
-export LANG=C
-# Prevent unzip from setting wrong timestamps
+# use consistant build env
+# https://wiki.debian.org/ReproducibleBuilds/Howto
+# especially important are the notes on `unzip` and `umask`
+export LC_ALL=C.UTF-8
 export TZ=UTC
+umask 0022
 
 if git diff-index --quiet HEAD --
 then
