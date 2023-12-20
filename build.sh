@@ -4,7 +4,7 @@ PACKAGE_NAME="solr"
 # upstream solr version
 SOLR_VERSION="6.6.5"
 # serial number for locally applied patch
-PATCH_NUMBER=2
+PATCH_NUMBER=3
 SOLR_DIR="${PACKAGE_NAME}-${SOLR_VERSION}"
 SOLR_ZIP="${PACKAGE_NAME}-${SOLR_VERSION}.zip"
 ARCH="all"
@@ -72,7 +72,7 @@ echo "Architecture: all"                                                       >
 echo "Section: web"                                                            >> $CONTROL_FILE
 echo "Priority: optional"                                                      >> $CONTROL_FILE
 echo 'Maintainer: "University of Michigan Library IT" <lit-noreply@umich.edu>' >> $CONTROL_FILE
-echo "Depends: default-jre-headless"                                           >> $CONTROL_FILE
+echo "Depends: default-jre-headless | java8-runtime-headless | java8-runtime"  >> $CONTROL_FILE
 echo "Description: Enterprise search server based on Lucene3 - common files"   >> $CONTROL_FILE
 echo " Solr is an open source enterprise search server based on the Lucene"    >> $CONTROL_FILE
 echo " Java search library, with XML/HTTP and JSON APIs, hit highlighting,"    >> $CONTROL_FILE
@@ -87,7 +87,7 @@ if command -v dpkg-deb > /dev/null; then
   $TOUCH_CMD $ROOT_DIR/DEBIAN
 
   dpkg-deb -Zxz --build --root-owner-group $ROOT_DIR
-  sha1sum $DEB
+  $SHA_CMD $DEB
 
   if ! [ -z $GITHUB_ENV ]; then
     # publish the deb name to GH env if we're running in a GH Action
